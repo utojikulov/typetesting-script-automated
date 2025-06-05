@@ -2,59 +2,41 @@ import puppeteer from "puppeteer";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// async function testBot() {
-//   const browser = await puppeteer.launch({ headless: false });
-//   const selector = 'input[name="search_query"]';
-//   try {
-//     const page = await browser.newPage();
-//     await page.goto("https://www.youtube.com", {
-//       waitUntil: "domcontentloaded",
-//     });
-//     await page.waitForSelector(selector);
-//     await page.click("input.yt-searchbox-input");
-//     await page.type(selector, "whosdis?");
-//     await page.keyboard.press("Enter");
-//     await delay(3000);
-//   } catch (err) {
-//     console.log("error occured", err);
-//   } finally {
-//     await browser.close();
-//   }
-// }
-
-// testBot();
-
 async function main() {
   const browser = await puppeteer.launch({ headless: false });
   // const wordsWrapper = "div#wordsWrapper";
   const page = await browser.newPage();
-  const cookiesModal = "dialog#cookiesModal";
   try {
     await page.goto("https://www.monkeytype.com", {
       waitUntil: "domcontentloaded",
     });
-    if (cookiesModal) {
-      await page.click("button.rejectAll");
+    const rejectCookiesBtn = "button.rejectAll";
+    if (await page.$(rejectCookiesBtn)) {
+      await page.click(rejectCookiesBtn);
     }
 
-    // focusing the typing area
+    // ensure words are rdy
     await page.waitForSelector(".word");
+
+    // focusing the typing area
+    // await page.click("div#words");
 
     // extract the word list
     const words = await page.$$eval(".word", (els) =>
       els.map((el) => el.textContent?.trim() || ""),
     );
 
-    console.log(words);
+    console.log(words, words.length);
     for (const word of words) {
       await page.keyboard.type(word + " ");
+      await delay(450);
     }
 
     await delay(5000);
   } catch (err) {
     console.log("error occured", err);
   } finally {
-    // await browser.close()
+    await browser.close();
   }
 }
 
