@@ -29,14 +29,14 @@ async function main() {
     console.log(words, words.length);
     for (const word of words) {
       await page.keyboard.type(word + " ");
-      await delay(450);
+      await delay(200);
     }
 
     await delay(5000);
   } catch (err) {
     console.log("error occured", err);
   } finally {
-    await browser.close();
+    // await browser.close();
   }
 }
 
